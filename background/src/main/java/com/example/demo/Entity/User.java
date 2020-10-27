@@ -4,6 +4,7 @@ package com.example.demo.Entity;
 //function:用户类
 public class User {
 //    用户id
+//    格式s00000001,s00001011(s后面8位，要补全)
     private String id;
 //    用户名
     private String username;

@@ -6,6 +6,7 @@ package com.example.demo.Entity;
 //change:
 public class Course {
 //  教程id
+//    格式c00000001,c00001011(c后面8位，要补全)
     private String courseId;
 //  链接
     private String link;

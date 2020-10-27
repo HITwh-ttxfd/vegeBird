@@ -4,6 +4,7 @@ package com.example.demo.Entity;
 //function:推荐兼职类
 public class RecommendTask {
     //    兼职id
+    //    格式t00000001,t00001011(t后面8位，要补全)
     private String id;
     //    标题
     private String title;

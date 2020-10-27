@@ -29,4 +29,10 @@ public class TaskController {
         }
         return "nihao";
     }
+//    测试函数
+    @CrossOrigin
+    @PostMapping("/TaskTest")
+    public String Test() throws Exception {
+        return "正常运转";
+    }
 }
