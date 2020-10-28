@@ -39,10 +39,5 @@ public class CourseConnector {
         return result;
     }
 
-    public static void main(String[] args) throws Exception {
-        Course course=new Course();
-        course.setOutType("develop");
-        course.setInType("software");
-        System.out.println(getCourse(course));
-    }
+
 }

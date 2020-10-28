@@ -8,9 +8,6 @@ import com.example.demo.Test.JDBCUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-
-import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
@@ -339,52 +336,4 @@ public class UserConnector {
     }
 
 
-    public void findByUsername() {
-        //定义sql
-        try {
-//            String sql = "INSERT INTO user VALUES (\"s00000004\", ?, ?,null );";
-            String sql="select * from user";
-//            template.update(sql, "王小淞", "3333");
-//            user = template.queryForList(sql);
-        }catch (Exception e){
-            System.out.println(e);
-        }
-//        user.
-    }
-
-    // query使用BeanPropertyRowMapper做映射返回对象
-    public static void test07() throws Exception {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
-
-        // 查询数据的SQL语句
-        String sql = "SELECT * FROM user;";
-        List<User> list = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(User.class));
-
-        for (User user : list) {
-            System.out.println(user);
-            user.toString();
-//            user.toString();
-        }
-    }
-
-
-    public static void main(String[] args) throws Exception {
-//        UserConnector p=new UserConnector();
-//        test07();
-        User user=new User();
-        user.setId("s00000008");
-//        user.setUsername("王一淞");
-//        user.setPassword("1");
-//        System.out.println(loginUser(user));
-//        user.setUsername("王琪淞");
-//        System.out.println(loginUser(user));
-//        user.setPassword("123456");
-////        System.out.println(loginUser(user));
-//        UserInfo userInfo=new UserInfo();
-//        userInfo.setId("s00000002");
-//        Record record=new Record("s00000001","t00000001");
-        System.out.println(getUserHistory(user));
-//        System.out.println(createAccount(user));
-//        System.out.println(getMaxUserId());
-    }
 }
