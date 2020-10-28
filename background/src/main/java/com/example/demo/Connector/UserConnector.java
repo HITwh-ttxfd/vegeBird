@@ -1,5 +1,7 @@
 package com.example.demo.Connector;
 
+import com.example.demo.Entity.Record;
+import com.example.demo.Entity.Task;
 import com.example.demo.Entity.User;
 import com.example.demo.Entity.UserInfo;
 import com.example.demo.Test.JDBCUtils;
@@ -7,13 +9,15 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
-//author:孙宝臻
-//date:2020-10-27
-//function:用户相关数据库操作
-
+//author:   孙宝臻
+//date:     2020-10-27————2020-10-28
+//function: 用户相关数据库操作
+//mark:     获取用户历史记录存在问题，待修正
 public class UserConnector {
 //    数据连接
     private JdbcTemplate template=new JdbcTemplate(JDBCUtils.getDataSource());
@@ -106,25 +110,30 @@ public class UserConnector {
     }
 
 //  function:获取用户详细信息
-//  传入参数：用户类：只传id
-//  返回值：执行成功返回"Ok" / 执行失败返回错误报告
-    public static List<UserInfo> getUserDetailedInformation(UserInfo user) throws Exception {
+//  传入参数：用户信息类：只传id
+//  返回值：执行成功返回——用户信息类——该id对应的用户的详细信息 / 执行失败返回空，并报错
+    public static UserInfo getUserDetailedInformation(UserInfo user) throws Exception {
         List<UserInfo> result=null;
         try{
             JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
             String sql = "SELECT * FROM user_info  WHERE id=?;";
-            //            设置返回值类型
             RowMapper<UserInfo> rowMapper = new BeanPropertyRowMapper<UserInfo>(UserInfo.class);
-            result = jdbcTemplate.query(sql, rowMapper,user.getId());//最后一个参数为username值
+            result = jdbcTemplate.query(sql, rowMapper,user.getId());
         }catch (Exception e)
         {
+            System.out.println(e);
             System.out.println("获取用户详细信息出现问题");
+            return null;
         }
-        return result;
+        if(result.isEmpty())
+        {
+            return null;
+        }
+        return result.get(0);
     }
 
 //  function:改变用户详细信息(包含一开始没有用户信息的创建和有了信息的更改)
-//  传入参数：用户类：id是必须的，别的随意
+//  传入参数：用户信息类：id是必须的，别的都要传
 //  返回值：执行成功返回"Ok" / 执行失败返回错误报告
     public static String changeUserInformation(UserInfo user) throws Exception {
         try{
@@ -149,6 +158,183 @@ public class UserConnector {
         }
         return "Ok";
     }
+
+//  function:获取用户简要信息（用户名、密码、头像）
+//  传入参数：用户类：id是必须的，别的不传
+//  返回值：执行成功返回用户类 / 执行失败返回空，并报错
+    public static User getUserBrieflyInformation(User user) throws Exception {
+    List<User> result=null;
+    try{
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+        String sql = "SELECT * FROM user  WHERE id=?;";
+        RowMapper<User> rowMapper = new BeanPropertyRowMapper<User>(User.class);
+        result = jdbcTemplate.query(sql, rowMapper,user.getId());
+    }catch (Exception e)
+    {
+        System.out.println(e);
+        System.out.println("获取用户简要信息出现问题");
+    }
+    if(result.isEmpty())
+    {
+        return null;
+    }
+    return result.get(0);
+    }
+
+
+//  function:生成用户历史记录
+//  传入参数：记录类：两个都要传
+//  返回值：执行成功返回"Ok" / 执行失败返回错误信息
+    public static String createUserHistory(Record record) throws Exception {
+        if(selectUserHistory(record))
+        {
+            return "Ok";
+        }
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "INSERT INTO history VALUES (?,?);";
+            jdbcTemplate.update(sql,record.getUserId(),record.getTaskId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("生成用户历史记录出现问题");
+        }
+        return "Ok";
+    }
+
+//  function:用户历史记录查重
+//  传入参数：记录类：两个都要传
+//  返回值：重复返回true，不重复返回false
+    public static boolean selectUserHistory(Record record) throws Exception {
+        List<Record> result=null;
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "SELECT * FROM history  WHERE user_id=? and task_id=?;";
+            RowMapper<Record> rowMapper = new BeanPropertyRowMapper<Record>(Record.class);
+            result = jdbcTemplate.query(sql, rowMapper,record.getUserId(),record.getTaskId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("用户历史记录查重出现问题");
+        }
+        if(result.isEmpty())
+        {
+            return false;
+        }
+        return true;
+    }
+
+//  function:获取用户历史记录
+//  传入参数：用户类：只传用户id
+//  返回值：兼职列表 / 执行失败返回空并报错
+    public static List<Task> getUserHistory(User user) throws Exception {
+        List<Task> result=null;
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "SELECT * FROM  task  WHERE id in (select distinct task_id from history where user_id=?);";
+            RowMapper<Task> rowMapper = new BeanPropertyRowMapper<Task>(Task.class);
+            result = jdbcTemplate.query(sql, rowMapper,user.getId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("获取用户历史记录出现问题");
+            return null;
+        }
+        if(result.isEmpty())
+        {
+            return null;
+        }
+        return result;
+    }
+
+//  function:生成用户收藏
+//  传入参数：记录类：两个都要传
+//  返回值：执行成功返回"Ok" / 执行失败返回错误信息
+    public static String createUserCollection(Record record) throws Exception {
+    if(selectUserCollection(record))
+    {
+        return "Ok";
+    }
+    try{
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+        String sql = "INSERT INTO collection VALUES (?,?);";
+        jdbcTemplate.update(sql,record.getUserId(),record.getTaskId());
+    }catch (Exception e)
+    {
+        System.out.println(e);
+        System.out.println("生成用户收藏记录出现问题");
+    }
+    return "Ok";
+}
+
+//  function:用户收藏记录查重
+//  传入参数：记录类：两个都要传
+//  返回值：重复返回true，不重复返回false
+    public static boolean selectUserCollection(Record record) throws Exception {
+        List<Record> result=null;
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "SELECT * FROM collection  WHERE user_id=? and task_id=?;";
+            RowMapper<Record> rowMapper = new BeanPropertyRowMapper<Record>(Record.class);
+            result = jdbcTemplate.query(sql, rowMapper,record.getUserId(),record.getTaskId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("用户收藏记录查重出现问题");
+        }
+        if(result.isEmpty())
+        {
+            return false;
+        }
+        return true;
+    }
+
+//  function:获取用户收藏记录
+//  传入参数：用户类：只传用户id
+//  返回值：兼职列表 / 执行失败返回空并报错
+    public static List<Task> getUserCollection(User user) throws Exception {
+        List<Task> result=null;
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "SELECT * FROM  task  WHERE id in (select distinct task_id from collection where user_id=?);";
+            RowMapper<Task> rowMapper = new BeanPropertyRowMapper<Task>(Task.class);
+            result = jdbcTemplate.query(sql, rowMapper,user.getId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("获取用户收藏记录出现问题");
+            return null;
+        }
+        if(result.isEmpty())
+        {
+            return null;
+        }
+        return result;
+    }
+
+    /**
+     *   function:删除用户收藏记录
+     *   传入参数：记录类：两个都要传
+     *   返回值：执行成功返回"Ok" / 执行失败返回错误信息
+     */
+    public static String deleteUserCollection(Record record) throws Exception {
+//        如果数据库没这条信息，那么返回成功
+        if(!selectUserHistory(record))
+        {
+            return "Ok";
+        }
+        try{
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(JDBCUtils.getDataSource());
+            String sql = "DELETE FROM collection WHERE user_id=? and task_id=?;";
+            jdbcTemplate.update(sql,record.getUserId(),record.getTaskId());
+        }catch (Exception e)
+        {
+            System.out.println(e);
+            System.out.println("删除用户历史记录出现问题");
+        }
+        return "Ok";
+    }
+
 
     public void findByUsername() {
         //定义sql
@@ -182,17 +368,19 @@ public class UserConnector {
     public static void main(String[] args) throws Exception {
 //        UserConnector p=new UserConnector();
 //        test07();
-//        User user=new User();
+        User user=new User();
+        user.setId("s00000008");
 //        user.setUsername("王一淞");
 //        user.setPassword("1");
 //        System.out.println(loginUser(user));
 //        user.setUsername("王琪淞");
 //        System.out.println(loginUser(user));
 //        user.setPassword("123456");
-//        System.out.println(loginUser(user));
-        UserInfo userInfo=new UserInfo();
-        userInfo.setId("s00000001");
-        System.out.println(getUserDetailedInformation(userInfo));
+////        System.out.println(loginUser(user));
+//        UserInfo userInfo=new UserInfo();
+//        userInfo.setId("s00000002");
+//        Record record=new Record("s00000001","t00000001");
+        System.out.println(getUserHistory(user));
 //        System.out.println(createAccount(user));
 //        System.out.println(getMaxUserId());
     }
