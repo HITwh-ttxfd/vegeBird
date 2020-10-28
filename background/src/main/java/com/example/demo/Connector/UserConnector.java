@@ -1,5 +1,15 @@
 package com.example.demo.Connector;
+//author:   孙宝臻
+//date:     2020-10-27————2020-10-28  开发完成
+//function: 用户相关数据库操作
+//mark:     获取用户历史记录存在问题，待修正
 
+
+/**
+ * change:
+ * changeauthor:
+ * changedate:
+ */
 import com.example.demo.Entity.Record;
 import com.example.demo.Entity.Task;
 import com.example.demo.Entity.User;
@@ -11,10 +21,6 @@ import org.springframework.jdbc.core.RowMapper;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
-//author:   孙宝臻
-//date:     2020-10-27————2020-10-28
-//function: 用户相关数据库操作
-//mark:     获取用户历史记录存在问题，待修正
 public class UserConnector {
 //    数据连接
     private JdbcTemplate template=new JdbcTemplate(JDBCUtils.getDataSource());

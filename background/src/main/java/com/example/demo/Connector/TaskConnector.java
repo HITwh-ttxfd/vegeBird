@@ -1,8 +1,13 @@
 package com.example.demo.Connector;
 //author:孙宝臻
-//date:2020-10-27
+//date:2020-10-27————2020-10-28  开发完成
 //function:兼职相关数据库操作
 
+/**
+ * change:
+ * changeauthor:
+ * changedate:
+ */
 import com.example.demo.Entity.RecommendTask;
 import com.example.demo.Entity.Task;
 import com.example.demo.Test.JDBCUtils;
