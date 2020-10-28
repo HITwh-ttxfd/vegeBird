@@ -7,7 +7,7 @@ package com.example.demo.Entity;
 public class Course {
 //  教程id
 //    格式c00000001,c00001011(c后面8位，要补全)
-    private String courseId;
+    private String id;
 //  链接
     private String link;
 //  标题
@@ -28,8 +28,8 @@ public class Course {
     public Course() {
     }
 
-    public Course(String courseId, String link, String title, String content, String outType, String inType, String source, String clickRate, String picture) {
-        this.courseId = courseId;
+    public Course(String id, String link, String title, String content, String outType, String inType, String source, String clickRate, String picture) {
+        this.id = id;
         this.link = link;
         this.title = title;
         this.content = content;
@@ -40,12 +40,12 @@ public class Course {
         this.picture = picture;
     }
 
-    public String getCourseId() {
-        return courseId;
+    public String getId() {
+        return id;
     }
 
-    public void setCourseId(String courseId) {
-        this.courseId = courseId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getLink() {
@@ -115,7 +115,7 @@ public class Course {
     @Override
     public String toString() {
         return "Course{" +
-                "courseId='" + courseId + '\'' +
+                "courseId='" + id + '\'' +
                 ", link='" + link + '\'' +
                 ", title='" + title + '\'' +
                 ", content='" + content + '\'' +

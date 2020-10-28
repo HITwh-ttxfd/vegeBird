@@ -289,9 +289,12 @@ public class UserConnector {
         return true;
     }
 
-//  function:获取用户收藏记录
-//  传入参数：用户类：只传用户id
-//  返回值：兼职列表 / 执行失败返回空并报错
+    /**
+     * function:获取用户收藏记录
+     * @param user 用户类：只传用户id
+     * @return 兼职列表 / 执行失败返回空并报错
+     * @throws Exception
+     */
     public static List<Task> getUserCollection(User user) throws Exception {
         List<Task> result=null;
         try{
